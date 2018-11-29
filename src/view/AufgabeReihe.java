@@ -40,15 +40,14 @@ public class AufgabeReihe extends JPanel{
 		
 		JLabel name = new JLabel(a.getName());
 		name.setPreferredSize(dimName);
+		name.setToolTipText(a.getName());
 		
 		JLabel projekt = new JLabel(a.getProjekt().getName());
 		projekt.setPreferredSize(dimProj);
+		projekt.setToolTipText(a.getProjekt().getName());
 		
 		beschreibung = new JLabel(a.getBeschreibung());
 		beschreibung.setPreferredSize(dimBesc);
-		JToolTip tipBeschreibung = new JToolTip();
-		tipBeschreibung.setTipText(a.getBeschreibung());
-		beschreibung.setToolTipText("<html>"+a.getBeschreibung()+"</html>");
 		
 		JLabel dauer = new JLabel(a.getDauer());
 		dauer.setPreferredSize(dimDauer);

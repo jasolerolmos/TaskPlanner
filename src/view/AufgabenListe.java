@@ -3,6 +3,7 @@ package view;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -15,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.RootPaneContainer;
 
 import model.Aufgabe;
 
@@ -70,10 +72,10 @@ public class AufgabenListe extends JScrollPane{
 						panel.setVisible(false);
 					else
 						panel.setVisible(true);
+					
 					ResizeComponents();
 				}
 			});
-			
 			aufgabenlistPanel.add(ar);
 			beschreibungPanel.add(panel);
 			
@@ -85,12 +87,15 @@ public class AufgabenListe extends JScrollPane{
 		ResizeComponents();
 	}
 
+	
+
 	public void ResizeComponents() {
 		Dimension dimensionAufgabenListe = new Dimension(this.getWidth()-13, 43);
 		for (AufgabeReihe jPanel : aufgabenlistPanel) {
 			jPanel.setPreferredSize(dimensionAufgabenListe);
 			jPanel.setBeschreibungSize((int)dimensionAufgabenListe.getWidth());
 		}
+		
 		int count = 0;
 		for (BeschreibungAnsicht panel : beschreibungPanel) {
 			panel.setNewSize(this.getWidth()+13);

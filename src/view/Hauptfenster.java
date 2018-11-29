@@ -13,6 +13,8 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -22,6 +24,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import controller.Controller;
@@ -47,7 +50,7 @@ public class Hauptfenster extends JFrame{
 		 * Tastatuer Events 
 		 */
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(tastetuer);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(new Rectangle( 0, 0, 920, 600));
 		setMinimumSize(new Dimension(920, 600));
 		setLocationRelativeTo(null);
@@ -271,6 +274,9 @@ public class Hauptfenster extends JFrame{
 		return anwenderPanel;
 	}
 
+	public void setCloseAction(WindowListener listener) {
+		this.addWindowListener(listener);
+	}
 
 	public JComboBox<Object> getSortieren() {
 		return sortieren;

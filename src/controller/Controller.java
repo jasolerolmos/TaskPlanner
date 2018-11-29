@@ -8,8 +8,9 @@ import java.awt.KeyEventDispatcher;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,17 +23,16 @@ import java.util.function.Function;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 //import javax.swing.JScrollBar;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.ColorUIResource;
 
 import Context.PersistenceManager;
-import TPLer.Launcher;
 import connection.Export;
 import connection.Laden;
 import model.Anwender;
@@ -94,20 +94,21 @@ public class Controller implements KeyEventDispatcher{
 	
 	public Controller() {
 		SetActionListeners();
-		
-		bearbeitenFenster.setIconImage(icono.getImage());
-		view.setIconImage(icono.getImage());
-		projektWin.setIconImage(icono.getImage());
-		exportWin.setIconImage(icono.getImage());
-		
         try {
         	TrayIcon trayIcon = new TrayIcon(new ImageIcon("image/trayicon.png").getImage(), "TaskDone");
-        	trayIcon.addActionListener(e -> view.setVisible(true));
+        	trayIcon.addActionListener(e -> {view.setVisible(true);view.setExtendedState(JFrame.NORMAL);});
         	SystemTray.getSystemTray().add(trayIcon);
         	
 		} catch (AWTException e) {
 			System.err.println("Error loading Trayicon: "+e.getMessage());
 		}
+        
+		bearbeitenFenster.setIconImage(icono.getImage());
+		view.setIconImage(icono.getImage());
+		projektWin.setIconImage(icono.getImage());
+		exportWin.setIconImage(icono.getImage());
+		
+
 	}
 	
 	public void start() {
@@ -117,15 +118,26 @@ public class Controller implements KeyEventDispatcher{
 
 		loginWin.setFenster();
 		loginWin.setVisible(true);
-		view.getSortieren().addItem(OrderType.NAME);
-		view.getSortieren().addItem(OrderType.PROJEKT);
-//		view.getSortieren().addItem(OrderType.ZEIT);
-		view.getSortieren().addItem(OrderType.DAUER);
+		if(view.isVisible()) {
+			view.getSortieren().addItem(OrderType.NAME);
+			view.getSortieren().addItem(OrderType.PROJEKT);
+	//		view.getSortieren().addItem(OrderType.ZEIT);
+			view.getSortieren().addItem(OrderType.DAUER);
+			
+	
+			wochenauswertung.getWocheControl().getVor().addActionListener(e -> actionVorWoche(wochenauswertung.getWocheControl()));
+			wochenauswertung.getWocheControl().getNach().addActionListener(e -> actionNachWoche(wochenauswertung.getWocheControl()));
+		}
 		
+	}
+	
 
-		wochenauswertung.getWocheControl().getVor().addActionListener(e -> actionVorWoche(wochenauswertung.getWocheControl()));
-		wochenauswertung.getWocheControl().getNach().addActionListener(e -> actionNachWoche(wochenauswertung.getWocheControl()));
-		
+	public void stop() {
+		if(JOptionPane.showConfirmDialog(view, "Bist du sicher?", "Task Planner schlieﬂen", JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION) {
+			loginWin.setVisible(false);
+//			view.setVisible(false);
+			view.dispose();
+		}
 	}
 	
 	private void actionLogout(ActionEvent e) {
@@ -148,7 +160,7 @@ public class Controller implements KeyEventDispatcher{
 	private void actionLaden(ActionEvent e) {
 		quellDatei.setFileFilter(new FileNameExtensionFilter("*.csv", "csv") );
 		
-		switch(quellDatei.showOpenDialog(view)) {
+		switch(quellDatei.showSaveDialog(view)) {
 		case JFileChooser.APPROVE_OPTION:
 			if(quellDatei.getSelectedFile()!=null) {
 				String fileName = quellDatei.getSelectedFile().getPath();
@@ -323,6 +335,52 @@ public class Controller implements KeyEventDispatcher{
 		}
 	}
 	
+	private WindowListener actionClose() {
+		return new WindowListener() {
+			
+			@Override
+			public void windowOpened(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowIconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void windowClosing(WindowEvent e) {
+
+				stop();
+			}
+			
+			@Override
+			public void windowClosed(WindowEvent e) {
+				// TODO Auto-generated method stub
+			}
+			
+			@Override
+			public void windowActivated(WindowEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		};
+	}
+
 	
 	private void getAufgabenTag() {
 		List<AufgabeAnsicht> zuZeien = new  ArrayList<AufgabeAnsicht>();
@@ -378,7 +436,7 @@ public class Controller implements KeyEventDispatcher{
 		
 		loginWin.getEnter().addActionListener(e -> EnterLogin());
 		
-		loginWin.getExit().addActionListener(e -> {loginWin.setVisible(false);System.exit(0);});
+		loginWin.getExit().addActionListener(e -> {stop();});
 		
 		bearbeitenFenster.getAbbrechenBTN().addActionListener(e -> bearbeitenFenster.setVisible(false));
 		
@@ -393,8 +451,12 @@ public class Controller implements KeyEventDispatcher{
 		wochenauswertung.getNachProjekt().addActionListener(e -> {wochenauswertung.setMode(1);getAufgabenTag();});
 		
 		wochenauswertung.getNachStunde().addActionListener(e -> {wochenauswertung.setMode(0);getAufgabenTag();});
+		
+		view.setCloseAction(actionClose());
+		
 	}
 
+	
 	private void actionSortierung(ActionEvent e) {
 		OrderType sortBy = (OrderType) view.getSortieren().getSelectedItem();
 		List<Aufgabe> l = manager.getAufgabePersistence().List(anwender);
@@ -804,7 +866,7 @@ public class Controller implements KeyEventDispatcher{
 	public void LoginFenster(KeyEvent e) {
 		switch (e.getKeyCode()) {
 			case KeyEvent.VK_ESCAPE:
-				System.exit(0);
+				stop();
 				break;
 			case KeyEvent.VK_ENTER:
 				EnterLogin();

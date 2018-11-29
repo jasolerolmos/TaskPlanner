@@ -54,7 +54,7 @@ public class ZeitenlisteReihe extends JPanel{
 		spalte2.setPreferredSize(new Dimension(75, 30));
 		JLabel spalte3 = new JLabel("Beende");
 		spalte3.setPreferredSize(new Dimension(75, 30));
-		JLabel spalte4 = new JLabel("Dauer");
+		JLabel spalte4 = new JLabel("Dauer (h)");
 		spalte3.setPreferredSize(new Dimension(80, 30));
 		
 		headers.setLayout(new FlowLayout(FlowLayout.LEADING));
@@ -95,40 +95,39 @@ public class ZeitenlisteReihe extends JPanel{
 		for (Zeit zeit : zeitenliste) {
 			JPanel title = new JPanel();
 			
-			title.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 15));
-//			title.setLayout(new BoxLayout(title, BoxLayout.LINE_AXIS));
-			title.setBackground(new Color(190, 190, 190));
-			title.setSize(new Dimension(430, 30));
-			title.setPreferredSize(new Dimension(430, 40));
+			title.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 5));
+//			title.setSize(new Dimension(450, 30));
+			title.setPreferredSize(new Dimension(475, 40));
+			title.setBackground(Design.reiheBG);
 			
 			JLabel datum = new JLabel(dateFormat.format(zeit.getAnfang()));
-			datum.setPreferredSize(new Dimension(170, 15));
+			datum.setPreferredSize(new Dimension(170, 30));
 			
 			JLabel spalte1 = new JLabel(timeFormat.format(zeit.getAnfang()));
-			spalte1.setPreferredSize(new Dimension(80, 15));
+			spalte1.setPreferredSize(new Dimension(80, 30));
 			
 			JLabel spalte2 = new JLabel(timeFormat.format(zeit.getBeende()));
-			spalte2.setPreferredSize(new Dimension(80, 15));
+			spalte2.setPreferredSize(new Dimension(80, 30));
 			
 			JLabel spalte3 = new JLabel(zeit.getDauerString().split(" ")[1]);
-			spalte3.setPreferredSize(new Dimension(50, 15));
+			spalte3.setPreferredSize(new Dimension(90, 30));
 			
-			JPanel button = new JPanel();
-			button.setLayout(new FlowLayout(FlowLayout.LEADING));
-			button.setBackground(Design.background1);
-			button.setSize(new Dimension(40, 30));
-			button.setPreferredSize(new Dimension(40, 40));
-			button.setBorder(null);
+//			JPanel button = new JPanel();
+//			button.setLayout(new FlowLayout(FlowLayout.LEADING));
+//			button.setBackground(Design.background1);
+//			button.setSize(new Dimension(40, 30));
+//			button.setPreferredSize(new Dimension(40, 40));
+//			button.setBorder(null);
 			
 			JButton loeschen = new JButton();
 			ImageIcon icon = new ImageIcon("image/delete.png");
 			loeschen.setIcon(icon);
-			loeschen.setBackground(Color.WHITE);
+//			loeschen.setBackground(Color.WHITE);
 			loeschen.setPreferredSize(new Dimension(30, 30));
 //			loeschen.setMargin(new Insets(0, 0, 0, 0));
 			loeschen.setBorder(null);
-//			loeschen.setOpaque(true);
-//			loeschen.setContentAreaFilled(false);
+			loeschen.setOpaque(true);
+			loeschen.setContentAreaFilled(false);
 //			loeschen.setBorderPainted(false);
 			loeschen.setCursor(new Cursor(Cursor.HAND_CURSOR));
 			
@@ -168,12 +167,12 @@ public class ZeitenlisteReihe extends JPanel{
 			title.add(spalte1);
 			title.add(spalte2);
 			title.add(spalte3);
+			title.add(loeschen);
 			
-			button.add(loeschen);
+//			button.add(loeschen);
 			loeschenButtonListe.add(loeschen);
-			title.setBackground(Design.reiheBG);
 			centro.add(title);
-			centro.add(button);
+//			centro.add(button);
 		}
 		add(scroll, BorderLayout.CENTER);
 		revalidate();
