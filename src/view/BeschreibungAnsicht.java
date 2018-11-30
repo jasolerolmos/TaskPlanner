@@ -34,8 +34,6 @@ public class BeschreibungAnsicht extends JScrollPane{
 		Dimension dimensionAufgabenListe = new Dimension(widthVater-margin, 150);
 		panel.setPreferredSize(dimensionAufgabenListe);
 		
-//		setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		
 		setVisible(false);
 	}
 

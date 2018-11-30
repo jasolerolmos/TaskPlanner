@@ -1,11 +1,14 @@
 package view;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Insets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,7 @@ public class Wochenauswertung extends JDialog{
 	private List<JPanel> panelList = new ArrayList<JPanel>();
 	private List<AufgabeAnsicht> zuZeien = new ArrayList<AufgabeAnsicht>();
 	private int mode = 0;
+	private SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 
 	public Wochenauswertung() {
 		setSize(width,  height);
@@ -77,7 +81,8 @@ public class Wochenauswertung extends JDialog{
 		content.add(mainPanel, BorderLayout.CENTER);
 		main.add(titlePanel, BorderLayout.NORTH);
 		main.add(content, BorderLayout.CENTER);
-				
+
+		setDatumPanel();
 		add(main);
 	}
 
@@ -86,8 +91,6 @@ public class Wochenauswertung extends JDialog{
 	}
 
 	public void setWocheControl(WocheControl wocheControl) {
-
-		System.out.println("setWocheControl");
 		this.wocheControl = wocheControl;
 	}
 
@@ -105,6 +108,8 @@ public class Wochenauswertung extends JDialog{
 	}	
 	private void showAufgabe() {
 		panelList.get(mainPanel.getSelectedIndex()).removeAll();
+		setDatumPanel();
+		
 		for (AufgabeAnsicht aufgabeAnsicht : zuZeien) {
 			panelList.get(mainPanel.getSelectedIndex()).add(new AufgabeAnsichtLinie(aufgabeAnsicht, this.getWidth()));
 		}
@@ -112,6 +117,21 @@ public class Wochenauswertung extends JDialog{
 		repaint();
 	}
 	
+	public void setDatumPanel() {
+		JPanel datumPanel = new JPanel();
+		datumPanel.setPreferredSize(new Dimension(this.getWidth()-25, 40));
+		datumPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+		datumPanel.setBackground(Design.background1);
+		
+		Date montagDate = wocheControl.getMontagDate();
+		Calendar aux = Calendar.getInstance();
+		aux.setTime(montagDate);
+		aux.add(Calendar.DATE, mainPanel.getSelectedIndex());
+		JLabel datum = new JLabel(sdf.format(aux.getTime()));
+		datum.setFont(new Font("Verdana", Font.BOLD, 20));
+		datumPanel.add(datum);
+		panelList.get(mainPanel.getSelectedIndex()).add(datumPanel);
+	}
 
 	public JButton getNachStunde() {
 		return nachStunde;

@@ -71,11 +71,8 @@ public class WocheControl extends JPanel {
 	}
 	
 	private void actionVorWoche() {
-
-		System.out.println("Anterior");
 		try {
 			heute.add(Calendar.WEEK_OF_YEAR, -1);
-			System.out.println("Hoy: "+heute.get(Calendar.WEEK_OF_YEAR));
 			label.setText("Woche: ");
 		} catch (Exception e) {
 			System.out.println("ERROR");
@@ -84,8 +81,6 @@ public class WocheControl extends JPanel {
 	}
 	
 	private void actionNachWoche() {
-
-		System.out.println("Anterior");
 		try {
 			heute.add(Calendar.WEEK_OF_YEAR, 1);
 			label.setText("Woche: "+heute.get(Calendar.WEEK_OF_YEAR));

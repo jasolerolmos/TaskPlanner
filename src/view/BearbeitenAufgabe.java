@@ -5,6 +5,11 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -19,6 +24,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.CaretListener;
 
 import model.Aufgabe;
 import model.Projekt;
@@ -238,12 +244,13 @@ public class BearbeitenAufgabe extends JDialog{
 		this.beschreibungJTA = beschreibungJTA;
 	}
 
-	public JTextField getNameJTF() {
-		return nameJTF;
-	}
 
-	public void setNameJTF(JTextField nameJTF) {
-		this.nameJTF = nameJTF;
+	public String getNameJTF() {
+		return nameJTF.getText();
+	}
+	
+	public void setNameJTF(String nameJTF) {
+		this.nameJTF.setText(" hola ");
 	}
 
 	public Aufgabe getAufgabe() {
@@ -278,5 +285,42 @@ public class BearbeitenAufgabe extends JDialog{
 	public void setCanESC(boolean canESC) {
 		this.canESC = canESC;
 	}
+
+	public void setSpeicherEnable(boolean flag) {
+		speichernBTN.setEnabled(flag);
+	}
+
+	public void setProjektAction(ActionListener action) {
+		alleProjekten.addActionListener(action);
+	}
+
+	public void setCaretNameText(CaretListener caret) {
+		nameJTF.addCaretListener(caret);
+	}
 	
+	public void setKeyTypedNameText(KeyListener listener) {
+//		nameJTF.addKeyListener(new KeyListener() {
+//			
+//			@Override
+//			public void keyTyped(KeyEvent e) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//			
+//			@Override
+//			public void keyReleased(KeyEvent e) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//			
+//			@Override
+//			public void keyPressed(KeyEvent e) {
+//				// TODO Auto-generated method stub
+//				
+//			}
+//		});
+		nameJTF.addKeyListener((KeyListener)listener);
+	}
+
+
 }

@@ -3,12 +3,12 @@ package controller;
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Insets;
-//import java.awt.Color;
 import java.awt.KeyEventDispatcher;
 import java.awt.SystemTray;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.text.DateFormat;
@@ -23,12 +23,12 @@ import java.util.function.Function;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
-//import javax.swing.JScrollBar;
+import javax.swing.event.CaretEvent;
+import javax.swing.event.CaretListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.ColorUIResource;
 
@@ -44,6 +44,7 @@ import view.AdminSecret;
 import view.AufgabeReihe;
 import view.AufgabenListe;
 import view.BearbeitenAufgabe;
+import view.BeschreibungAnsicht;
 import view.Design;
 //import view.AufgabeReihe;
 import view.Hauptfenster;
@@ -89,9 +90,9 @@ public class Controller implements KeyEventDispatcher{
 	private Anwender anwender;
 	private SpeichernFenster exportWin = new SpeichernFenster();
 	private ImageIcon icono = new ImageIcon("image/icono.png");
-	private SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+//	private SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
 	private final JFileChooser quellDatei = new JFileChooser();
-	
+	private static int __maxLenghtNameAufgabe = 10;
 	public Controller() {
 		SetActionListeners();
         try {
@@ -108,7 +109,7 @@ public class Controller implements KeyEventDispatcher{
 		projektWin.setIconImage(icono.getImage());
 		exportWin.setIconImage(icono.getImage());
 		
-
+		
 	}
 	
 	public void start() {
@@ -135,14 +136,14 @@ public class Controller implements KeyEventDispatcher{
 	public void stop() {
 		if(JOptionPane.showConfirmDialog(view, "Bist du sicher?", "Task Planner schlieﬂen", JOptionPane.OK_CANCEL_OPTION)==JOptionPane.OK_OPTION) {
 			loginWin.setVisible(false);
-//			view.setVisible(false);
-			view.dispose();
+			view.setVisible(false);
+			System.exit(0);
 		}
 	}
 	
 	private void actionLogout(ActionEvent e) {
 		view.buttonStatus(false);
-		view.getUsername().setText("");		
+		view.setUsername("" ,"");		
 		panelAufgaben = view.getScrollPanel();
 		panelAufgaben.setBackground(Design.background2);
 		panelAufgaben.setAufgaben(new ArrayList<Aufgabe>());
@@ -152,10 +153,20 @@ public class Controller implements KeyEventDispatcher{
 	}
 	
 	private void actionNeueAufgabe(ActionEvent e) {
-		setProjekteComboBox();
 		bearbeitenFenster.setAufgabe(new Aufgabe());
-		BearbeitenFensterVisible();
+		bearbeitenFenster.setSpeicherEnable(false);
+
+		setListenersButtonsZeitenlist();
+		
+		setProjekteComboBox();
+		bearbeitenFenster.setFenster();
+		bearbeitenFenster.setCaretNameText(c -> setCaretNameAufgate());
+		bearbeitenFenster.setProjektAction(p -> setCaretNameAufgate());
+		bearbeitenFenster.setKeyTypedNameText(actionKeyTypedNameAufgabe());
+		
+		bearbeitenFenster.setVisible(true);
 	}
+	
 	
 	private void actionLaden(ActionEvent e) {
 		quellDatei.setFileFilter(new FileNameExtensionFilter("*.csv", "csv") );
@@ -198,30 +209,28 @@ public class Controller implements KeyEventDispatcher{
 	}
 	
 	private void actionSpeichern(ActionEvent e) {
-		if(!bearbeitenFenster.getNameJTF().getText().isEmpty()) {
+		if(!bearbeitenFenster.getNameJTF().isEmpty()) {
 			Aufgabe aufgabe = bearbeitenFenster.getAufgabe();
 
 			boolean exist = false;
 			int index = aufgabe.getId()-1;
-			System.out.println("Index: "+index);
 			
 
 			for(Aufgabe auf: manager.getAufgabePersistence().List(anwender)) {
 				if(auf.getName().equals(aufgabe.getName()) && auf.getProjekt().getId() == aufgabe.getProjekt().getId() && auf.getId() != aufgabe.getId()) {
 					exist = true;
-					System.out.println("Ya existe");
 				}
 			}
 			
 			
 			if(!exist) {
 				if(index>=0) {
-					manager.getAufgabePersistence().List(anwender).get(index).setName(bearbeitenFenster.getNameJTF().getText());
+					manager.getAufgabePersistence().List(anwender).get(index).setName(bearbeitenFenster.getNameJTF());
 					manager.getAufgabePersistence().List(anwender).get(index).setBeschreibung(bearbeitenFenster.getBeschreibungJTA().getText());
 				}
 				else {
 					aufgabe.setId(aufgabe.getId());
-					aufgabe.setName(bearbeitenFenster.getNameJTF().getText().trim());
+					aufgabe.setName(bearbeitenFenster.getNameJTF().trim());
 					aufgabe.setBeschreibung(bearbeitenFenster.getBeschreibungJTA().getText());
 					aufgabe.setAnwender(anwender);
 					aufgabe.setProjekt((Projekt) bearbeitenFenster.getAlleProjekten().getSelectedItem());
@@ -382,6 +391,62 @@ public class Controller implements KeyEventDispatcher{
 	}
 
 	
+	private void setCaretNameAufgate() {
+		if(bearbeitenFenster.getNameJTF().length()>0) {
+			
+			bearbeitenFenster.setSpeicherEnable(true);
+			int id  = -1;
+			if(bearbeitenFenster.getAlleProjekten().getSelectedIndex()>0)
+				id = ((Projekt)bearbeitenFenster.getAlleProjekten().getSelectedItem()).getId();
+			for (Aufgabe aufgabe : manager.getAufgabePersistence().List(anwender)) {
+				if(aufgabe.getName().toLowerCase().equals(bearbeitenFenster.getNameJTF().toLowerCase()) 
+						&& aufgabe.getProjekt().getId()==id) {
+					bearbeitenFenster.setSpeicherEnable(false);
+//					bearbeitenFenster.setMessageFehler("Das Aufgabe existiert schon");
+					System.out.println("Ya existe");
+				}
+			}
+			
+		}
+		else {
+			bearbeitenFenster.setSpeicherEnable(false);
+		}
+	}
+	
+	private KeyListener actionKeyTypedNameAufgabe() {
+		return new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+
+				if(bearbeitenFenster.getNameJTF().length()>__maxLenghtNameAufgabe) {
+					e.consume();
+				}
+			}
+			
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if(bearbeitenFenster.getNameJTF().length()>__maxLenghtNameAufgabe) {
+					e.consume();
+				}
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				System.out.println("Tecla: "+e.getID());
+				if(bearbeitenFenster.getNameJTF().length()>__maxLenghtNameAufgabe) {
+					e.consume();
+				}
+				if(e.isControlDown() && e.getID() == KeyEvent.VK_V) {
+					System.out.println("Paste");
+					e.consume();
+				}
+			}
+		};
+		
+	}
+	
+	
 	private void getAufgabenTag() {
 		List<AufgabeAnsicht> zuZeien = new  ArrayList<AufgabeAnsicht>();
 		Date montagDate = wochenauswertung.getWocheControl().getMontagDate();
@@ -453,7 +518,6 @@ public class Controller implements KeyEventDispatcher{
 		wochenauswertung.getNachStunde().addActionListener(e -> {wochenauswertung.setMode(0);getAufgabenTag();});
 		
 		view.setCloseAction(actionClose());
-		
 	}
 
 	
@@ -483,17 +547,6 @@ public class Controller implements KeyEventDispatcher{
 		setListenersButtonsAufgaben();
 	}
 	
-	/*
-	 * Es macht Visible die BearbeitenFenster
-	 */
-	public void BearbeitenFensterVisible() {
-		bearbeitenFenster.setFenster();
-		
-		setListenersButtonsZeitenlist();
-
-		bearbeitenFenster.setVisible(true);
-	}
-	
 	
 	/*
 	 * Es festlegt die Listeners von jeder Aufgabe 
@@ -506,9 +559,12 @@ public class Controller implements KeyEventDispatcher{
 	}
 
 	private void actionAufgabeBearbeiten(AufgabeReihe ar) {
-		setProjekteComboBox();
 		bearbeitenFenster.setAufgabe(ar.getAufgabe());
-		BearbeitenFensterVisible();
+		setListenersButtonsZeitenlist();
+
+		setProjekteComboBox();
+		bearbeitenFenster.setFenster();
+		bearbeitenFenster.setVisible(true);
 	}
 	
 	private void actionAufgabeLoeschen(AufgabeReihe ar) {
@@ -643,7 +699,7 @@ public class Controller implements KeyEventDispatcher{
 				String userNachname = benutzername.split("\\.")[1];
 				userNachname = userNachname.substring(0, 1).toUpperCase()+userNachname.substring(1);
 				userName = userName.substring(0, 1).toUpperCase()+userName.substring(1);
-				view.getUsername().setText(userName+" "+userNachname);
+				view.setUsername(userName, userNachname);
 				setAufgabeListevonAnwender();
 			}
 			else {
@@ -664,22 +720,43 @@ public class Controller implements KeyEventDispatcher{
 		int x = view.getX() + (view.getWidth()/2)-(projektWin.getWidth()/2);
 		int y = view.getY() + (view.getHeight()/2)-(projektWin.getHeight()/2);
 
-		projektWin.setFenster(x, y);		
-
+		projektWin.setFenster(x, y);
+		projektWin.setSpeichernEnable(false);
 		projektWin.getSpeichern().addActionListener(this::actionProjektSpeichern);
-
+		projektWin.setCaretNeueProjekt(this::setCaretNameProjekt);
 		projektAddListenersListe();
 		projektWin.setVisible(true);
 	}
 	
+	private void setCaretNameProjekt(CaretEvent e) {
+
+		if(projektWin.getNeueName().length()>0) {
+			projektWin.setSpeichernEnable(true);
+			projektWin.setMessageFehler("");
+			
+			for (Projekt projekt : manager.getProjektPersistence().List()) {
+				if(projekt.getName().toLowerCase().equals(projektWin.getNeueName().toLowerCase())) {
+					projektWin.setSpeichernEnable(false);
+					projektWin.setMessageFehler("Das Projekt existiert schon");
+				}
+			}
+		}
+		else {
+			projektWin.setMessageFehler("Neu Name musst nicht leere sein");
+			projektWin.setSpeichernEnable(false);
+		}
+		
+	}
+	
 	private void actionProjektSpeichern(ActionEvent e) {
-		Projekt neueProjekt = new Projekt(projektWin.getNeueName().getText());
-		if(manager.getProjektPersistence().Load(projektWin.getNeueName().getText()).getId()==0) {
+		Projekt neueProjekt = new Projekt(projektWin.getNeueName());
+		if(manager.getProjektPersistence().Load(projektWin.getNeueName()).getId()==0) {
 			System.out.println(neueProjekt.getId());
 			manager.getProjektPersistence().Save(neueProjekt);
 			projektWin.setListe(manager.getProjektPersistence().List());
 			projektWin.setListeProjekten();
 			projektAddListenersListe();
+			projektWin.setSpeichernEnable(false);
 		}
 		else {
 			JOptionPane.showMessageDialog(bearbeitenFenster, 
@@ -810,9 +887,7 @@ public class Controller implements KeyEventDispatcher{
 				break;
 			case KeyEvent.VK_N:
 				if(e.isControlDown()) {
-					setProjekteComboBox();
-					bearbeitenFenster.setAufgabe(new Aufgabe());
-					BearbeitenFensterVisible();
+					actionNeueAufgabe(null);
 				}
 				break;
 			case KeyEvent.VK_S:

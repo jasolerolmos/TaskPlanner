@@ -13,7 +13,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.List;
 
@@ -24,7 +23,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import controller.Controller;
@@ -153,11 +151,12 @@ public class Hauptfenster extends JFrame{
 		// Die Größe von dem Anwendername. Aktuelle Größe, ohne Buttons. 
 		Dimension dim = new Dimension(this.getWidth()-645, 40);
 		usernamePanel.setPreferredSize(dim);
-//		usernamePanel.setBackground(Color.WHITE);
-		username = new JLabel("");
+		username = new JLabel();
 		usernamePanel.setBackground(Design.background1);
-		Font font = new Font(fontName, Font.BOLD, 22);
+		Font font = new Font(fontName, Font.BOLD, 14);
 		username.setFont(font);
+		FlowLayout fl = (FlowLayout) usernamePanel.getLayout();
+		fl.setVgap(0);
 		usernamePanel.add(username);
 
 		north.add(neueAufgabeBTN);
@@ -266,8 +265,8 @@ public class Hauptfenster extends JFrame{
 		return logoutBTN;
 	}
 
-	public JLabel getUsername() {
-		return username;
+	public void setUsername(String vorname, String nachname) {
+		username.setText("<html><p style='text-align: right'>"+vorname+"<br>"+nachname+"</p></html>");
 	}
 	
 	public JPanel getAnwenderPanel() {

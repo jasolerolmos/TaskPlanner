@@ -17,6 +17,7 @@ public class Design {
 	public static Color buttonBG = new Color(48, 162, 255);
 	public static Color buttonBG2 = new Color(140, 212, 255);
 	public static Color title1 = new Color(0, 0, 0);
+	public static Color errorMessage = new Color(255, 50, 50);
 //	public static Color background1 = new Color(244, 226, 133);
 	
 	

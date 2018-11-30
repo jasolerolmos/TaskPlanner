@@ -33,15 +33,16 @@ public class MeineTextField extends JTextField{
     		|| ev.getKeyCode()==KeyEvent.VK_LEFT
     		|| ev.getKeyCode()==KeyEvent.VK_RIGHT )
 			 super.processKeyEvent(ev);
-		 
-	    if (Character.isDigit(ev.getKeyChar()) && getText().length()<2){
-	        super.processKeyEvent(ev);
-        }
-        if(ich.getText().length()>0 && ich.getSelectedText()!=null)
-	        if(ich.getSelectedText().length()==2) {
-	        	super.processKeyEvent(ev);
+		if(Character.isDigit(ev.getKeyChar())) {
+		    if (getText().length()<2){
+		        super.processKeyEvent(ev);
 	        }
-        ev.consume();
+	        if(ich.getText().length()>0 && ich.getSelectedText()!=null)
+		        if(ich.getSelectedText().length()==2) {
+		        	super.processKeyEvent(ev);
+		        }
+	        ev.consume();
+		}
         return;
     }
 

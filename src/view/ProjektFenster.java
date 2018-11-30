@@ -30,6 +30,7 @@ public class ProjektFenster extends JDialog{
 	private List<ProjektReihe> listeReihe = new ArrayList<ProjektReihe> ();
 	private JButton speichern;
 	private JTextField neueName;
+	private JLabel message = new JLabel("");
 	JScrollPane scrollProjekten = new JScrollPane();
 	
 	public ProjektFenster() {
@@ -48,15 +49,18 @@ public class ProjektFenster extends JDialog{
 		
 		north = new JPanel();
 		north.setLayout(new FlowLayout());
+		north.setBackground(Design.background2);
+		
 		JLabel title = new JLabel("Projekten");
 		title.setFont(new Font("Verdanad", Font.BOLD, 22));
 		title.setForeground(Design.title1);
-		north.setBackground(Design.background2);
+
 		north.add(title);
 
 		center = new JPanel();
-		setListeProjekten();
 		center.setBackground(Design.background1);
+		
+		setListeProjekten();
 		
 		south = new JPanel();
 		south.setLayout(new BorderLayout());
@@ -67,28 +71,30 @@ public class ProjektFenster extends JDialog{
 		
 		JLabel titleNeue = new JLabel("Neue Projekt");
 		titleNeue.setFont(new Font("Verdana", Font.BOLD, 18));
+		
 		neueProjektPanel.add(Box.createRigidArea(new Dimension(10, 15)));
 		neueProjektPanel.add(titleNeue);
+		neueProjektPanel.add(Box.createRigidArea(new Dimension(10, 15)));
+		
+		message.setForeground(Design.errorMessage);
+		message.setFont(new Font("Verdana", Font.PLAIN, 12));
+		neueProjektPanel.add(message);
 		
 		south.add(neueProjektPanel, BorderLayout.NORTH);		
+		
 		JPanel neuePanel = new JPanel();
 		neuePanel.setLayout(new FlowLayout(FlowLayout.LEADING));
 		neuePanel.setBackground(Design.background1);
+		
 		JLabel neueNameLBL = new JLabel("Name");
 		neueNameLBL.setPreferredSize(new Dimension(50, 30));
 		neuePanel.add(neueNameLBL);
+		
 		neueName = new JTextField();
 		neueName.setPreferredSize(new Dimension(width-180, 30));
-		neueName.addCaretListener(new CaretListener() {
-			@Override
-			public void caretUpdate(CaretEvent e) {
-				if(neueName.getText().length()>0)
-					speichern.setEnabled(true);
-				else
-					speichern.setEnabled(false);
-			}
-		});
+		
 		neuePanel.add(neueName);
+		
 		speichern = new JButton("Sprichern");
 		speichern.setPreferredSize(new Dimension(100, 30));
 		neuePanel.add(speichern);
@@ -144,17 +150,29 @@ public class ProjektFenster extends JDialog{
 		return speichern;
 	}
 
+	public void setSpeichernEnable(boolean flag) {
+		speichern.setEnabled(flag);
+	}
+	
+	public void setCaretNeueProjekt(CaretListener cListener) {
+		neueName.addCaretListener(cListener);
+	}
+	
 	public void setSpeichern(JButton speichern) {
 		this.speichern = speichern;
 	}
 
-	public JTextField getNeueName() {
-		return neueName;
+	public String getNeueName() {
+		return neueName.getText();
 	}
 
 	public void setNeueName(JTextField neueName) {
 		this.neueName = neueName;
 	}
 
+	public void setMessageFehler(String text) {
+		message.setText(text);
+	}
+	
 	
 }

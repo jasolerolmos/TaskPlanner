@@ -40,7 +40,7 @@ public class ZeitenlisteReihe extends JPanel{
 	private List<JButton> loeschenButtonListe = new ArrayList<JButton>();
 	private DateFormat timeFormat = new SimpleDateFormat("HH:mm");
 	private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-	private NeueZeitReihe south = new NeueZeitReihe();
+	private ZeitNeueReihe south = new ZeitNeueReihe();
 	private JPanel centro = new JPanel();
 	private JScrollPane scroll = new JScrollPane();
 	
@@ -185,7 +185,7 @@ public class ZeitenlisteReihe extends JPanel{
 		}
 	}
 
-	public NeueZeitReihe getNeueZeit() {
+	public ZeitNeueReihe getNeueZeit() {
 		return south;
 	}
 
